@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>لوحة التحكم | ماي فون ستور</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ===== شاشة الدخول ===== -->
+  <section class="login" id="loginView" hidden>
+    <form class="login-box" id="loginForm">
+      <div class="brand">📱 ماي فون <b>ستور</b></div>
+      <h1>لوحة تحكم المدير</h1>
+      <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="username" dir="ltr">
+      <input type="password" id="loginPass" placeholder="كلمة المرور" autocomplete="current-password" dir="ltr">
+      <p class="login-error" id="loginError"></p>
+      <button class="btn primary full" type="submit">دخول</button>
+      <p class="hint" id="loginHint"></p>
+      <a href="index.html" class="back">← العودة للمتجر</a>
+    </form>
+  </section>
+
+  <!-- ===== اللوحة ===== -->
+  <div class="app" id="appView" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">📱 ماي فون <b>ستور</b></div>
+      <nav class="tabs" id="tabs">
+        <button data-tab="overview" class="active">📊 نظرة عامة</button>
+        <button data-tab="products">📦 المنتجات</button>
+        <button data-tab="discounts">🏷️ التخفيضات والعروض</button>
+        <button data-tab="customers">👥 الزبائن</button>
+        <button data-tab="orders">🧾 الطلبات <span class="pill" id="newOrdersPill" hidden></span></button>
+        <button data-tab="visits">👁️ الزيارات والأجهزة</button>
+        <button data-tab="settings">⚙️ الإعدادات</button>
+      </nav>
+      <div class="side-foot">
+        <a href="index.html" target="_blank">🛍️ عرض المتجر</a>
+        <button id="logoutBtn">🚪 تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" aria-label="القائمة">☰</button>
+        <h2 id="pageTitle">نظرة عامة</h2>
+        <div class="top-actions">
+          <span class="mode-badge" id="modeBadge"></span>
+          <button class="btn ghost" id="refreshBtn" title="تحديث البيانات">⟳ تحديث</button>
+        </div>
+      </header>
+
+      <!-- نظرة عامة -->
+      <section class="tab-panel" id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat"><span class="stat-label">إجمالي الزيارات</span><span class="stat-value" id="stVisits">0</span></div>
+          <div class="stat"><span class="stat-label">زوار مختلفون</span><span class="stat-value" id="stUnique">0</span></div>
+          <div class="stat"><span class="stat-label">زيارات اليوم</span><span class="stat-value" id="stToday">0</span></div>
+          <div class="stat"><span class="stat-label">زبائن مسجلون</span><span class="stat-value" id="stCustomers">0</span></div>
+          <div class="stat"><span class="stat-label">الطلبات</span><span class="stat-value" id="stOrders">0</span></div>
+          <div class="stat"><span class="stat-label">قيمة الطلبات</span><span class="stat-value" id="stRevenue">0</span></div>
+        </div>
+
+        <div class="card">
+          <h3>الزيارات خلال آخر 14 يوماً</h3>
+          <div class="vchart" id="visitsChart"></div>
+        </div>
+
+        <div class="cards-3">
+          <div class="card"><h3>نوع الجهاز</h3><div class="hbars" id="deviceChart"></div></div>
+          <div class="card"><h3>نظام التشغيل</h3><div class="hbars" id="osChart"></div></div>
+          <div class="card"><h3>المتصفح</h3><div class="hbars" id="browserChart"></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>آخر الطلبات</h3><button class="link" data-goto="orders">عرض الكل ←</button></div>
+          <div class="table-wrap"><table id="recentOrders"></table></div>
+        </div>
+      </section>
+
+      <!-- المنتجات -->
+      <section class="tab-panel" id="tab-products" hidden>
+        <div class="toolbar">
+          <input type="search" id="prodSearch" placeholder="ابحث عن منتج...">
+          <select id="prodCat">
+            <option value="all">كل الأقسام</option>
+          </select>
+          <button class="btn primary" id="addProductBtn">+ إضافة منتج</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table id="productsTable"></table></div></div>
+      </section>
+
+      <!-- التخفيضات -->
+      <section class="tab-panel" id="tab-discounts" hidden>
+        <div class="cards-2">
+          <form class="card form" id="bulkDiscountForm">
+            <h3>تخفيض جماعي</h3>
+            <p class="muted">طبّق نسبة خصم على قسم كامل أو على كل المنتجات.</p>
+            <label>القسم
+              <select id="bulkCat"><option value="all">كل المنتجات</option></select>
+            </label>
+            <label>نسبة الخصم %
+              <input type="number" id="bulkPercent" min="0" max="90" value="10" required>
+            </label>
+            <div class="row">
+              <button class="btn primary" type="submit">تطبيق الخصم</button>
+              <button class="btn danger" type="button" id="removeDiscountsBtn">إلغاء التخفيضات</button>
+            </div>
+          </form>
+
+          <form class="card form" id="offerForm">
+            <h3>كوبون العرض (يظهر في الصفحة الرئيسية)</h3>
+            <label class="check"><input type="checkbox" id="offerEnabled"> تفعيل العرض</label>
+            <label>عنوان العرض <input type="text" id="offerTitle" required></label>
+            <div class="row">
+              <label>كود الكوبون <input type="text" id="offerCode" dir="ltr" required></label>
+              <label>نسبة الخصم % <input type="number" id="offerPercent" min="1" max="90" required></label>
+            </div>
+            <div class="row">
+              <label>على قسم <select id="offerCat"><option value="all">كل المنتجات</option></select></label>
+              <label>ينتهي في <input type="date" id="offerEnd"></label>
+            </div>
+            <button class="btn primary" type="submit">حفظ العرض</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>المنتجات المخفّضة حالياً</h3>
+          <div class="table-wrap"><table id="discountedTable"></table></div>
+        </div>
+      </section>
+
+      <!-- الزبائن -->
+      <section class="tab-panel" id="tab-customers" hidden>
+        <div class="toolbar">
+          <input type="search" id="custSearch" placeholder="ابحث بالاسم أو رقم الهاتف...">
+          <select id="custDevice">
+            <option value="all">كل الأجهزة</option>
+            <option value="mobile">جوال</option>
+            <option value="tablet">تابلت</option>
+            <option value="desktop">كمبيوتر</option>
+          </select>
+          <button class="btn ghost" id="exportCustomers">⬇ تصدير Excel (CSV)</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table id="customersTable"></table></div></div>
+      </section>
+
+      <!-- الطلبات -->
+      <section class="tab-panel" id="tab-orders" hidden>
+        <div class="toolbar">
+          <input type="search" id="orderSearch" placeholder="ابحث بالاسم أو الهاتف...">
+          <select id="orderStatus">
+            <option value="all">كل الحالات</option>
+          </select>
+        </div>
+        <div class="card"><div class="table-wrap"><table id="ordersTable"></table></div></div>
+      </section>
+
+      <!-- الزيارات -->
+      <section class="tab-panel" id="tab-visits" hidden>
+        <div class="card">
+          <h3>أكثر الأجهزة زيارة</h3>
+          <div class="hbars" id="modelChart"></div>
+        </div>
+        <div class="card">
+          <h3>آخر 200 زيارة</h3>
+          <div class="table-wrap"><table id="visitsTable"></table></div>
+        </div>
+      </section>
+
+      <!-- الإعدادات -->
+      <section class="tab-panel" id="tab-settings" hidden>
+        <div class="cards-2">
+          <form class="card form" id="settingsForm">
+            <h3>واتساب المحل</h3>
+            <label>رقم واتساب الذي تصل عليه الطلبات (بالصيغة الدولية)
+              <input type="tel" id="setWhatsapp" dir="ltr" placeholder="218912345678" required>
+            </label>
+            <label>رمز الدولة (لمراسلة الزبائن من اللوحة)
+              <input type="text" id="setCountry" dir="ltr" placeholder="218">
+            </label>
+            <button class="btn primary" type="submit">حفظ</button>
+          </form>
+
+          <form class="card form" id="passwordForm">
+            <h3>كلمة مرور اللوحة</h3>
+            <p class="muted" id="pwNote"></p>
+            <label>كلمة المرور الجديدة <input type="password" id="newPass" minlength="6" dir="ltr"></label>
+            <button class="btn primary" type="submit" id="pwBtn">تغيير</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>حالة قاعدة البيانات</h3>
+          <p id="dbStatus" class="muted"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== نافذة المنتج ===== -->
+  <div class="modal" id="productModal">
+    <form class="modal-box form" id="productForm">
+      <button type="button" class="modal-close" data-close aria-label="إغلاق">✕</button>
+      <h3 id="productFormTitle">إضافة منتج</h3>
+      <input type="hidden" id="pId">
+      <label>اسم المنتج <input type="text" id="pName" required></label>
+      <label>الوصف <input type="text" id="pDesc"></label>
+      <div class="row">
+        <label>السعر <input type="number" id="pPrice" min="0" step="0.5" required></label>
+        <label>الخصم % <input type="number" id="pDiscount" min="0" max="90" value="0"></label>
+      </div>
+      <p class="muted" id="pFinal"></p>
+      <div class="row">
+        <label>القسم <select id="pCat"></select></label>
+        <label>التقييم <select id="pRating">
+          <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+        </select></label>
+      </div>
+      <label>صورة المنتج (من جهازك)
+        <input type="file" id="pImgFile" accept="image/*">
+      </label>
+      <label>أو رابط صورة / رمز تعبيري
+        <div class="row">
+          <input type="text" id="pImg" placeholder="img/photo.jpg أو https://..." dir="ltr">
+          <input type="text" id="pEmoji" placeholder="📱" class="emoji-input">
+        </div>
+      </label>
+      <div class="img-preview" id="pPreview"></div>
+      <label class="check"><input type="checkbox" id="pActive" checked> ظاهر في المتجر</label>
+      <button class="btn primary full" type="submit">حفظ المنتج</button>
+    </form>
+  </div>
+
+  <!-- ===== نافذة تفاصيل الطلب ===== -->
+  <div class="modal" id="orderModal">
+    <div class="modal-box" id="orderDetails"></div>
+  </div>
+
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
